@@ -202,7 +202,53 @@
             </div>
         </div>
     </div>
+    <div id="updatePopup"
+        class="fixed bottom-5 right-5 bg-white rounded-lg shadow-xl max-w-xs w-full border border-gray-100 overflow-hidden z-50 transform translate-y-full opacity-0 transition-all duration-500">
+        <div class="bg-accent px-4 py-2 flex justify-between items-center">
+            <h3 class="font-bold text-white text-sm flex items-center">
+                <i class="fa fa-star mr-2"></i>版本更新
+            </h3>
+            <button id="closePopup" class="text-white hover:text-gray-200 transition-colors p-1">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-700 text-sm">🎉星璇资源站已更新至2.0.45版本，带来更多优质资源和优化体验🎉<br><br></p>
+            <button id="checkUpdate"
+                class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded transition-colors text-sm font-medium mt-3">
+                查看更新内容
+            </button>
+        </div>
+    </div>
 
+    <!-- 配套JavaScript -->
+    <script>
+        // 检查是否已经显示过弹窗
+        if (!localStorage.getItem('updatePopupShown')) {
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('updatePopup');
+
+                // 延迟显示，让页面先加载完成
+                setTimeout(() => {
+                    popup.classList.remove('translate-y-full', 'opacity-0');
+                    // 标记为已显示
+                    localStorage.setItem('updatePopupShown', 'true');
+                }, 1500);
+
+                // 关闭弹窗
+                document.getElementById('closePopup').addEventListener('click', function () {
+                    popup.classList.add('translate-y-full', 'opacity-0');
+                });
+
+                // 查看更新按钮
+                document.getElementById('checkUpdate').addEventListener('click', function () {
+                    // 可以替换为实际的更新日志页面链接
+                    alert('2.0.45版本更新内容：\n- 新增资源分类筛选\n- 优化加载速度\n- 修复已知bug');
+                    popup.classList.add('translate-y-full', 'opacity-0');
+                });
+            });
+        }
+    </script>
     <script>
         // API基础URL
         const API_BASE_URL = 'api/handle.php';
