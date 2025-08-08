@@ -17,6 +17,10 @@ switch ($action) {
         require_once 'add_resource.php';
         break;
         
+    case 'add_resource_public':
+        require_once 'add_resource_public.php';
+        break;
+        
     case 'delete_resource':
         require_once 'delete_resource.php';
         break;

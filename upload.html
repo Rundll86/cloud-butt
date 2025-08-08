@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传资源 - 资源共享平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 配置颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            .transition-custom {
+                transition: all 0.3s ease;
+            }
+            .animate-shake {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+            @keyframes shake {
+                10%, 90% { transform: translateX(-1px); }
+                20%, 80% { transform: translateX(2px); }
+                30%, 50%, 70% { transform: translateX(-3px); }
+                40%, 60% { transform: translateX(3px); }
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 网站标志 -->
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fa fa-cloud-download text-primary text-2xl mr-2"></i>
+                        <span class="font-bold text-lg text-dark">资源共享平台</span>
+                    </a>
+                </div>
+
+                <!-- 导航链接 -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="flex items-center text-gray-600 hover:text-primary transition-custom">
+                        <i class="fa fa-home mr-1"></i> 主站首页
+                    </a>
+                    <a href="#" class="flex items-center text-primary font-medium">
+                        <i class="fa fa-upload mr-1"></i> 上传资源
+                    </a>
+                </nav>
+
+                <!-- 移动端功能图标 -->
+                <div class="md:hidden flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-primary">
+                        <i class="fa fa-home text-xl"></i>
+                    </a>
+                    <a href="#" class="text-primary">
+                        <i class="fa fa-upload text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-2">上传资源</h1>
+            <p class="text-gray-500 max-w-2xl mx-auto">分享您的资源给社区，让更多人受益</p>
+        </div>
+
+        <!-- 上传资源表单 -->
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow">
+                <h2 class="text-lg font-semibold text-dark mb-5 flex items-center">
+                    <i class="fa fa-cloud-upload text-secondary mr-2"></i> 资源信息
+                </h2>
+
+                <form id="uploadResourceForm" class="space-y-5">
+                    <div>
+                        <label for="resourceName" class="block text-sm font-medium text-gray-700 mb-1">资源名称 <span
+                                class="text-danger">*</span></label>
+                        <input type="text" id="resourceName" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="例如：Python基础教程.pdf">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label for="resourceType" class="block text-sm font-medium text-gray-700 mb-1">资源类型 <span
+                                    class="text-danger">*</span></label>
+                            <select id="resourceType" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom">
+                                <option value="">请选择类型</option>
+                                <option value="document">文档</option>
+                                <option value="video">视频</option>
+                                <option value="archive">压缩包</option>
+                                <option value="program">编程</option>
+                                <option value="image">图片</option>
+                                <option value="game">游戏</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="uploaderName" class="block text-sm font-medium text-gray-700 mb-1">您的昵称 <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="uploaderName" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                                placeholder="例如：编程爱好者">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="uploadDate" class="block text-sm font-medium text-gray-700 mb-1">上传日期 <span
+                                class="text-danger">*</span></label>
+                        <input type="date" id="uploadDate" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom">
+                    </div>
+
+                    <div>
+                        <label for="resourceLink" class="block text-sm font-medium text-gray-700 mb-1">下载链接 <span
+                                class="text-danger">*</span></label>
+                        <input type="url" id="resourceLink" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="例如：https://pan.baidu.com/s/...">
+                    </div>
+
+                    <div>
+                        <label for="resourceDesc" class="block text-sm font-medium text-gray-700 mb-1">资源描述</label>
+                        <textarea id="resourceDesc" rows="4"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="简要描述该资源的内容和用途..."></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full bg-secondary hover:bg-secondary/90 text-white py-3 px-4 rounded-lg transition-custom flex items-center justify-center gap-2 font-medium">
+                            <i class="fa fa-cloud-upload"></i> 提交资源
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center text-gray-500 text-sm">
+                <p>© 2023 资源共享平台 - 免费分享优质资源</p>
+                <p class="mt-1">资源仅供学习交流使用，请遵守相关法律法规</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 通知提示 -->
+    <div id="notification"
+        class="fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs">
+        <i id="notificationIcon" class="fa fa-check-circle text-white text-lg"></i>
+        <span id="notificationText" class="text-white"></span>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE_URL = 'api/handle.php';
+
+        // DOM元素获取
+        const uploadResourceForm = document.getElementById('uploadResourceForm');
+        const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationText = document.getElementById('notificationText');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初始化日期为今天
+            document.getElementById('uploadDate').valueAsDate = new Date();
+
+            // 上传资源表单提交
+            uploadResourceForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                await uploadResource();
+            });
+        });
+
+        // 上传资源
+        async function uploadResource() {
+            // 获取表单数据
+            const name = document.getElementById('resourceName').value.trim();
+            const type = document.getElementById('resourceType').value;
+            const uploader = document.getElementById('uploaderName').value.trim();
+            const date = document.getElementById('uploadDate').value;
+            const link = document.getElementById('resourceLink').value.trim();
+            const description = document.getElementById('resourceDesc').value.trim();
+
+            // 验证表单
+            if (!name || !type || !uploader || !date || !link) {
+                showNotification('请填写所有必填字段', 'error');
+                return;
+            }
+
+            try {
+                // 准备JSON数据
+                const jsonData = {
+                    name: name,
+                    type: type,
+                    uploader: uploader,
+                    date: date,
+                    link: link,
+                    description: description
+                };
+
+                const response = await fetch(`${API_BASE_URL}?action=add_resource_public`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 重置表单
+                    uploadResourceForm.reset();
+                    document.getElementById('uploadDate').valueAsDate = new Date();
+
+                    showNotification('资源提交成功，感谢您的分享！', 'success');
+                } else {
+                    showNotification('提交失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('提交资源出错:', error);
+                showNotification('提交资源时发生错误', 'error');
+            }
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            notificationText.textContent = message;
+
+            // 设置通知样式
+            if (type === 'success') {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-green-500';
+                notificationIcon.className = 'fa fa-check-circle text-white text-lg';
+            } else if (type === 'error') {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-danger';
+                notificationIcon.className = 'fa fa-exclamation-circle text-white text-lg';
+            } else {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-primary';
+                notificationIcon.className = 'fa fa-info-circle text-white text-lg';
+            }
+
+            // 显示通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(calc(100% + 20px))';
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
