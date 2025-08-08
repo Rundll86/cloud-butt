@@ -25,14 +25,5 @@
         "date": "2023-08-08",
         "link": "https:\/\/example.com\/test.pdf",
         "description": "这是一个测试资源"
-    },
-    {
-        "id": "79eeed50ff70",
-        "name": "1",
-        "type": "document",
-        "uploader": "1",
-        "date": "2025-08-08",
-        "link": "https:\/\/1.c",
-        "description": "1"
     }
 ]

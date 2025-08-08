@@ -718,14 +718,11 @@
         // 删除资源
         async function handleDeleteResource(resourceId) {
             try {
-                // 创建FormData对象
-                const formData = new FormData();
-                formData.append('admin_password', adminPassword);
-                formData.append('id', resourceId);
-
-                const response = await fetch(`${API_BASE_URL}?action=delete_resource`, {
-                    method: 'POST',
-                    body: formData
+                const response = await fetch(`${API_BASE_URL}?action=delete_resource&id=${resourceId}`, {
+                    method: 'delete',
+                    headers: {
+                        Authorization: `Bearer ${adminPassword}`
+                    }
                 });
 
                 const data = await response.json();
