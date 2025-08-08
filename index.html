@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源共享平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 配置颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#10b981',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 网站标志 -->
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fa fa-cloud-download text-primary text-2xl mr-2"></i>
+                        <span class="font-bold text-lg text-dark">资源共享平台</span>
+                    </a>
+                </div>
+
+                <!-- 导航链接 -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="flex items-center text-primary font-medium">
+                        <i class="fa fa-home mr-1"></i> 首页
+                    </a>
+                    <a href="admin.html" class="flex items-center text-gray-600 hover:text-primary transition-all">
+                        <i class="fa fa-cog mr-1"></i> 管理后台
+                    </a>
+                </nav>
+
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-600 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="mb-10 text-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-3">免费资源共享平台</h1>
+            <p class="text-gray-500 max-w-2xl mx-auto">发现和分享各类优质资源，包括文档、视频、软件和教程等</p>
+        </div>
+
+        <!-- 资源分类 -->
+        <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button class="category-btn active px-4 py-2 rounded-full bg-primary text-white text-sm font-medium"
+                data-category="all">
+                全部资源
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="document">
+                <i class="fa fa-file-text-o mr-1"></i> 文档
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="video">
+                <i class="fa fa-file-video-o mr-1"></i> 视频
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="archive">
+                <i class="fa fa-file-zip-o mr-1"></i> 压缩包
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="program">
+                <i class="fa fa-file-code-o mr-1"></i> 编程
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="image">
+                <i class="fa fa-file-image-o mr-1"></i> 图片
+            </button>
+            <button
+                class="category-btn px-4 py-2 rounded-full bg-white text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all"
+                data-category="game">
+                <i class="fa fa-gamepad mr-1"></i> 游戏
+            </button>
+        </div>
+
+        <!-- 资源统计 -->
+        <div class="bg-white rounded-xl p-6 mb-8 shadow-sm">
+            <h2 class="text-lg font-semibold text-dark mb-4">资源统计</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-primary mb-1" id="totalResources">0</div>
+                    <div class="text-gray-500 text-sm">总资源数</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-blue-500 mb-1" id="docCount">0</div>
+                    <div class="text-gray-500 text-sm">文档资源</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-purple-500 mb-1" id="videoCount">0</div>
+                    <div class="text-gray-500 text-sm">视频资源</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-green-500 mb-1" id="programCount">0</div>
+                    <div class="text-gray-500 text-sm">编程资源</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资源列表 -->
+        <div class="mb-10">
+            <h2 class="text-xl font-semibold text-dark mb-5 flex items-center">
+                <i class="fa fa-th-list text-primary mr-2"></i> 资源列表
+            </h2>
+
+            <div id="resourceList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 资源卡片会通过JavaScript动态生成 -->
+                <div class="col-span-full text-center py-16 text-gray-500" id="emptyState">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <i class="fa fa-folder-open-o text-2xl"></i>
+                    </div>
+                    <p class="text-lg">暂无资源数据</p>
+                    <p class="text-sm mt-2">请通过管理后台添加资源</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-gray-500 text-sm">
+                <p>© 2023 资源共享平台 - 免费分享优质资源</p>
+                <p class="mt-2">资源仅供学习交流使用，请遵守相关法律法规</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 资源详情模态框 -->
+    <div id="resourceModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+            <div class="p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-dark" id="modalResourceName"></h3>
+                <div class="flex items-center gap-3 mt-2 text-sm text-gray-500">
+                    <span id="modalResourceType"></span>
+                    <span><i class="fa fa-user-o mr-1"></i> <span id="modalResourceUploader"></span></span>
+                    <span><i class="fa fa-calendar-o mr-1"></i> <span id="modalResourceDate"></span></span>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="mb-5">
+                    <h4 class="font-medium text-gray-700 mb-2">资源描述</h4>
+                    <p class="text-gray-600" id="modalResourceDesc">暂无描述</p>
+                </div>
+
+                <div class="border-t border-gray-100 pt-5">
+                    <h4 class="font-medium text-gray-700 mb-3">下载链接</h4>
+                    <a href="#" id="modalResourceLink" target="_blank"
+                        class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg transition-all font-medium">
+                        <i class="fa fa-download"></i>
+                        <span>点击下载资源</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE_URL = 'api/handle.php';
+
+        // DOM元素
+        const resourceList = document.getElementById('resourceList');
+        const emptyState = document.getElementById('emptyState');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const resourceModal = document.getElementById('resourceModal');
+        const modalResourceName = document.getElementById('modalResourceName');
+        const modalResourceType = document.getElementById('modalResourceType');
+        const modalResourceUploader = document.getElementById('modalResourceUploader');
+        const modalResourceDate = document.getElementById('modalResourceDate');
+        const modalResourceDesc = document.getElementById('modalResourceDesc');
+        const modalResourceLink = document.getElementById('modalResourceLink');
+
+        // 统计元素
+        const totalResources = document.getElementById('totalResources');
+        const docCount = document.getElementById('docCount');
+        const videoCount = document.getElementById('videoCount');
+        const programCount = document.getElementById('programCount');
+
+        // 类型名称映射
+        const typeNames = {
+            'document': '文档',
+            'video': '视频',
+            'archive': '压缩包',
+            'program': '编程',
+            'image': '图片',
+            'game': '游戏'
+        };
+
+        // 类型颜色映射
+        const typeColors = {
+            'document': 'bg-blue-100 text-blue-700',
+            'video': 'bg-purple-100 text-purple-700',
+            'archive': 'bg-amber-100 text-amber-700',
+            'program': 'bg-green-100 text-green-700',
+            'image': 'bg-red-100 text-red-700',
+            'game': 'bg-indigo-100 text-indigo-700'
+        };
+
+        // 类型图标映射
+        const typeIcons = {
+            'document': 'fa-file-text-o',
+            'video': 'fa-file-video-o',
+            'archive': 'fa-file-zip-o',
+            'program': 'fa-file-code-o',
+            'image': 'fa-file-image-o',
+            'game': 'fa-gamepad'
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 加载资源
+            loadResources();
+
+            // 绑定分类按钮事件
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 更新按钮样式
+                    categoryBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+                    });
+                    btn.classList.add('active', 'bg-primary', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+
+                    // 筛选资源
+                    const category = btn.getAttribute('data-category');
+                    filterResources(category);
+                });
+            });
+
+            // 点击模态框外部关闭
+            resourceModal.addEventListener('click', (e) => {
+                if (e.target === resourceModal) {
+                    resourceModal.classList.add('hidden');
+                }
+            });
+        });
+
+        // 从API加载资源
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE_URL}?action=get_resources`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    showNotification('加载资源失败: ' + (data.error || '未知错误'), 'error');
+                    return;
+                }
+
+                // 更新统计数据
+                updateResourceStats(data.data);
+
+                // 检查是否有资源
+                if (data.count === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+
+                // 按日期降序排序
+                const sortedResources = [...data.data].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                // 清空列表
+                resourceList.innerHTML = '';
+
+                // 创建资源卡片
+                sortedResources.forEach(
+                    /**
+                     * @type {{}}
+                     */
+                    resource => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-white rounded-xl shadow-sm overflow-hidden card-hover resource-card';
+                        card.setAttribute('data-category', resource.type);
+
+                        // 格式化日期显示
+                        const formattedDate = formatDate(resource.date);
+
+                        card.innerHTML = `
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center">
+                                    <i class="fa ${typeIcons[resource.type]} ${getTypeColorClass(resource.type)} text-xl mr-3"></i>
+                                    <h3 class="font-semibold text-dark">${resource.name}</h3>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-xs ${typeColors[resource.type]}">
+                                    ${typeNames[resource.type]}
+                                </span>
+                            </div>
+                            
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                                ${resource.description || '暂无描述'}
+                            </p>
+                            
+                            <div class="flex justify-between items-center text-xs text-gray-500">
+                                <span><i class="fa fa-user-o mr-1"></i> ${resource.uploader}</span>
+                                <span><i class="fa fa-calendar-o mr-1"></i> ${formattedDate}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="px-5 pb-5">
+                            <button class="view-resource w-full bg-primary/10 hover:bg-primary/20 text-primary py-2 rounded-lg transition-all text-sm font-medium" 
+                                    data-id="${resource.id}">
+                                查看详情
+                            </button>
+                        </div>
+                    `;
+
+                        resourceList.appendChild(card);
+                    });
+
+                // 绑定查看详情按钮事件
+                document.querySelectorAll('.view-resource').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const resourceId = btn.getAttribute('data-id');
+                        await showResourceDetails(resourceId);
+                    });
+                });
+
+            } catch (error) {
+                console.error('加载资源出错:', error);
+                showNotification('加载资源时发生错误', 'error');
+            }
+        }
+
+        // 筛选资源
+        function filterResources(category) {
+            const resourceCards = document.querySelectorAll('.resource-card');
+
+            resourceCards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // 检查筛选后是否有可见资源
+            const visibleCards = document.querySelectorAll('.resource-card[style="display: block;"]');
+            if (visibleCards.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p:first-of-type').textContent = '该分类暂无资源';
+                emptyState.querySelector('p:last-of-type').textContent = '请查看其他分类或通过管理后台添加';
+            } else {
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        // 显示资源详情
+        async function showResourceDetails(resourceId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}?action=get_resource&id=${resourceId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    showNotification('获取资源详情失败: ' + (data.error || '未知错误'), 'error');
+                    return;
+                }
+
+                // 获取到的资源数据
+                const resource = data.data;
+
+                // 填充模态框内容
+                modalResourceName.textContent = resource.name;
+                modalResourceType.innerHTML = `<span class="px-2 py-0.5 rounded-full text-xs ${typeColors[resource.type]}">${typeNames[resource.type]}</span>`;
+                modalResourceUploader.textContent = resource.uploader;
+                modalResourceDate.textContent = formatDate(resource.date);
+                modalResourceDesc.textContent = resource.description || '暂无描述';
+                modalResourceLink.href = resource.link;
+
+                // 显示模态框
+                resourceModal.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('获取资源详情出错:', error);
+                showNotification('获取资源详情时发生错误', 'error');
+            }
+        }
+
+        // 更新资源统计
+        function updateResourceStats(resources) {
+            // 计算各类资源数量
+            const docResources = resources.filter(r => r.type === 'document').length;
+            const videoResources = resources.filter(r => r.type === 'video').length;
+            const programResources = resources.filter(r => r.type === 'program').length;
+
+            // 更新统计显示
+            totalResources.textContent = resources.length;
+            docCount.textContent = docResources;
+            videoCount.textContent = videoResources;
+            programCount.textContent = programResources;
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        }
+
+        // 获取类型颜色类
+        function getTypeColorClass(type) {
+            const colors = {
+                'document': 'text-blue-500',
+                'video': 'text-purple-500',
+                'archive': 'text-amber-500',
+                'program': 'text-green-500',
+                'image': 'text-red-500',
+                'game': 'text-indigo-500'
+            };
+            return colors[type] || 'text-gray-500';
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-50 flex items-center gap-2 max-w-xs`;
+
+            // 设置通知样式
+            if (type === 'success') {
+                notification.classList.add('bg-green-500', 'text-white');
+                notification.innerHTML = `<i class="fa fa-check-circle"></i> <span>${message}</span>`;
+            } else if (type === 'error') {
+                notification.classList.add('bg-red-500', 'text-white');
+                notification.innerHTML = `<i class="fa fa-exclamation-circle"></i> <span>${message}</span>`;
+            } else {
+                notification.classList.add('bg-primary', 'text-white');
+                notification.innerHTML = `<i class="fa fa-info-circle"></i> <span>${message}</span>`;
+            }
+
+            // 添加到页面
+            document.body.appendChild(notification);
+
+            // 显示通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(calc(100% + 20px))';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

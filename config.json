@@ -1,0 +1,7 @@
+{
+    "site_name": "资源共享平台",
+    "admin_password": "$2y$10$6Q3GuJbpmB0uP1sjy5b9yOzv4mS3H8f3bZq8R4y7H8e9a0b1c2d3e",
+    "data_file": "data/resources.json",
+    "upload_dir": "uploads/",
+    "max_upload_size": 5242880
+}

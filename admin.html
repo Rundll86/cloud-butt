@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源站管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 配置颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            .transition-custom {
+                transition: all 0.3s ease;
+            }
+            .animate-shake {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+            @keyframes shake {
+                10%, 90% { transform: translateX(-1px); }
+                20%, 80% { transform: translateX(2px); }
+                30%, 50%, 70% { transform: translateX(-3px); }
+                40%, 60% { transform: translateX(3px); }
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 网站标志 -->
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fa fa-cloud-download text-primary text-2xl mr-2"></i>
+                        <span class="font-bold text-lg text-dark">资源共享平台</span>
+                    </a>
+                </div>
+
+                <!-- 导航链接 -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="flex items-center text-gray-600 hover:text-primary transition-custom">
+                        <i class="fa fa-home mr-1"></i> 主站首页
+                    </a>
+                    <a href="#" class="flex items-center text-primary font-medium">
+                        <i class="fa fa-cog mr-1"></i> 管理后台
+                    </a>
+                </nav>
+
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-600 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-2">资源管理后台</h1>
+            <p class="text-gray-500 max-w-2xl mx-auto">管理所有资源数据，添加新资源或移除不需要的资源</p>
+        </div>
+
+        <!-- 登录区域 -->
+        <div id="loginSection" class="max-w-md mx-auto">
+            <div class="bg-white rounded-xl p-6 md:p-8 card-shadow">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                        <i class="fa fa-lock text-primary text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-dark">管理员登录</h2>
+                    <p class="text-gray-500 mt-1">请输入密码以访问管理功能</p>
+                </div>
+
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                        <div class="relative">
+                            <input type="password" id="password"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                                placeholder="请输入管理密码" required>
+                            <button type="button" id="togglePassword"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-primary transition-custom">
+                                <i class="fa fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg transition-custom flex items-center justify-center gap-2 font-medium">
+                        <i class="fa fa-sign-in"></i> 登录管理后台
+                    </button>
+                </form>
+
+                <div id="loginError" class="mt-4 text-danger text-sm hidden text-center">
+                    <i class="fa fa-exclamation-circle mr-1"></i> 密码错误，请重试
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理区域 (默认隐藏) -->
+        <div id="adminSection" class="hidden">
+            <!-- 操作工具栏 -->
+            <div class="bg-white rounded-xl p-4 mb-6 card-shadow flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-dark flex items-center">
+                        <i class="fa fa-dashboard text-primary mr-2"></i> 资源管理中心
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="refreshBtn"
+                        class="text-gray-600 hover:text-primary transition-custom flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 hover:border-primary/30">
+                        <i class="fa fa-refresh"></i>
+                        <span class="hidden sm:inline">刷新列表</span>
+                    </button>
+                    <button id="logoutBtn"
+                        class="text-gray-600 hover:text-danger transition-custom flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 hover:border-danger/30">
+                        <i class="fa fa-sign-out"></i>
+                        <span class="hidden sm:inline">退出登录</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 添加资源表单 -->
+            <div class="bg-white rounded-xl p-6 mb-6 card-shadow">
+                <h2 class="text-lg font-semibold text-dark mb-5 flex items-center">
+                    <i class="fa fa-plus-circle text-secondary mr-2"></i> 添加新资源
+                </h2>
+
+                <form id="addResourceForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <input type="hidden" id="editResourceId" value="">
+
+                    <div class="lg:col-span-3">
+                        <label for="resourceName" class="block text-sm font-medium text-gray-700 mb-1">资源名称 <span
+                                class="text-danger">*</span></label>
+                        <input type="text" id="resourceName" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="例如：Python基础教程.pdf">
+                    </div>
+
+                    <div>
+                        <label for="resourceType" class="block text-sm font-medium text-gray-700 mb-1">资源类型 <span
+                                class="text-danger">*</span></label>
+                        <select id="resourceType" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom">
+                            <option value="">请选择类型</option>
+                            <option value="document">文档</option>
+                            <option value="video">视频</option>
+                            <option value="archive">压缩包</option>
+                            <option value="program">编程</option>
+                            <option value="image">图片</option>
+                            <option value="game">游戏</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="uploaderName" class="block text-sm font-medium text-gray-700 mb-1">上传者 <span
+                                class="text-danger">*</span></label>
+                        <input type="text" id="uploaderName" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="例如：编程爱好者">
+                    </div>
+
+                    <div>
+                        <label for="uploadDate" class="block text-sm font-medium text-gray-700 mb-1">上传日期 <span
+                                class="text-danger">*</span></label>
+                        <input type="date" id="uploadDate" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom">
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <label for="resourceLink" class="block text-sm font-medium text-gray-700 mb-1">下载链接 <span
+                                class="text-danger">*</span></label>
+                        <input type="url" id="resourceLink" required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="例如：https://pan.baidu.com/s/...">
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <label for="resourceDesc" class="block text-sm font-medium text-gray-700 mb-1">资源描述</label>
+                        <textarea id="resourceDesc" rows="3"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            placeholder="简要描述该资源的内容和用途..."></textarea>
+                    </div>
+
+                    <div class="lg:col-span-3 flex justify-end gap-3">
+                        <button type="button" id="cancelEditBtn"
+                            class="hidden bg-gray-100 hover:bg-gray-200 text-gray-800 py-2.5 px-6 rounded-lg transition-custom flex items-center gap-1 font-medium">
+                            <i class="fa fa-times"></i> 取消
+                        </button>
+                        <button type="submit"
+                            class="bg-secondary hover:bg-secondary/90 text-white py-2.5 px-6 rounded-lg transition-custom flex items-center gap-1 font-medium">
+                            <i class="fa fa-save"></i> 保存资源
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 资源列表 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow">
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold text-dark flex items-center">
+                        <i class="fa fa-list-alt text-primary mr-2"></i> 资源列表
+                        <span id="resourceCount"
+                            class="ml-2 text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">0 个资源</span>
+                    </h2>
+                </div>
+
+                <!-- 列表标题 -->
+                <div class="grid grid-cols-12 py-3 px-5 bg-gray-50 border-b text-sm font-medium text-gray-500">
+                    <div class="col-span-5 md:col-span-4">资源名称</div>
+                    <div class="col-span-3 hidden md:block">类型</div>
+                    <div class="col-span-2 hidden sm:block">上传者</div>
+                    <div class="col-span-4 md:col-span-2 hidden lg:block">上传日期</div>
+                    <div class="col-span-7 md:col-span-2">操作</div>
+                </div>
+
+                <!-- 资源列表内容 -->
+                <div id="adminResourceList" class="divide-y divide-gray-100">
+                    <!-- 这里的内容会通过JavaScript动态生成 -->
+                </div>
+
+                <div id="noResources" class="py-16 text-center text-gray-500">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <i class="fa fa-folder-open-o text-2xl"></i>
+                    </div>
+                    <p class="text-lg">暂无资源数据</p>
+                    <p class="text-sm mt-1 text-gray-400">点击"添加新资源"按钮开始添加</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center text-gray-500 text-sm">
+                <p>© 2023 资源共享平台 - 后台管理系统</p>
+                <p class="mt-1">与主站数据同步更新</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 确认删除弹窗 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 mx-4 transform transition-all">
+            <div class="text-center mb-5">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                    <i class="fa fa-trash text-danger text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-lg text-dark">确认删除</h3>
+                <p class="text-gray-500 mt-2">您确定要删除这个资源吗？此操作不可撤销，主站也将同步删除。</p>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button id="cancelDelete"
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2.5 rounded-lg transition-custom font-medium">
+                    取消
+                </button>
+                <button id="confirmDelete"
+                    class="flex-1 bg-danger hover:bg-danger/90 text-white py-2.5 rounded-lg transition-custom font-medium">
+                    确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="notification"
+        class="fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs">
+        <i id="notificationIcon" class="fa fa-check-circle text-white text-lg"></i>
+        <span id="notificationText" class="text-white"></span>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE_URL = 'api/handle.php';
+
+        // DOM元素获取
+        const loginSection = document.getElementById('loginSection');
+        const adminSection = document.getElementById('adminSection');
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const addResourceForm = document.getElementById('addResourceForm');
+        const adminResourceList = document.getElementById('adminResourceList');
+        const noResources = document.getElementById('noResources');
+        const resourceCount = document.getElementById('resourceCount');
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationText = document.getElementById('notificationText');
+        const editResourceId = document.getElementById('editResourceId');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+        // 当前要删除的资源ID
+        let resourceToDelete = null;
+        let adminPassword = '';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初始化日期为今天
+            document.getElementById('uploadDate').valueAsDate = new Date();
+
+            // 检查登录状态
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                adminPassword = localStorage.getItem('adminPassword') || '';
+                showAdminSection();
+                loadResources();
+            }
+
+            // 登录表单提交处理
+            loginForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                await handleLogin();
+            });
+
+            // 切换密码可见性
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // 切换图标
+                const icon = togglePassword.querySelector('i');
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+
+            // 退出登录
+            logoutBtn.addEventListener('click', function () {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('adminLoggedIn');
+                    localStorage.removeItem('adminPassword');
+                    adminPassword = '';
+                    adminSection.classList.add('hidden');
+                    loginSection.classList.remove('hidden');
+                    showNotification('已成功退出登录', 'info');
+                }
+            });
+
+            // 刷新资源列表
+            refreshBtn.addEventListener('click', function () {
+                loadResources();
+                showNotification('资源列表已刷新', 'info');
+            });
+
+            // 添加/编辑资源表单提交
+            addResourceForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const resourceId = editResourceId.value;
+
+                if (resourceId) {
+                    await updateResource(resourceId);
+                } else {
+                    await addResource();
+                }
+            });
+
+            // 取消编辑
+            cancelEditBtn.addEventListener('click', function () {
+                resetForm();
+            });
+
+            // 取消删除
+            cancelDelete.addEventListener('click', function () {
+                deleteModal.classList.add('hidden');
+                resourceToDelete = null;
+            });
+
+            // 确认删除
+            confirmDelete.addEventListener('click', async function () {
+                if (resourceToDelete !== null) {
+                    await handleDeleteResource(resourceToDelete);
+                    deleteModal.classList.add('hidden');
+                    resourceToDelete = null;
+                }
+            });
+        });
+
+        // 处理登录
+        async function handleLogin() {
+            const password = passwordInput.value.trim();
+
+            if (!password) {
+                showNotification('请输入密码', 'error');
+                return;
+            }
+
+            try {
+                // 创建FormData对象
+                const formData = new FormData();
+                formData.append('password', password);
+
+                const response = await fetch(`${API_BASE_URL}?action=admin_login`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 登录成功
+                    loginError.classList.add('hidden');
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    localStorage.setItem('adminPassword', password);
+                    adminPassword = password;
+                    showAdminSection();
+                    passwordInput.value = '';
+                    await loadResources();
+                    showNotification('登录成功，欢迎回来！', 'success');
+                } else {
+                    // 登录失败
+                    loginError.classList.remove('hidden');
+                    passwordInput.classList.add('animate-shake');
+                    setTimeout(() => {
+                        passwordInput.classList.remove('animate-shake');
+                    }, 500);
+                    showNotification('密码错误，请重试', 'error');
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                showNotification('登录失败，请检查网络连接', 'error');
+            }
+        }
+
+        // 显示管理区域
+        function showAdminSection() {
+            loginSection.classList.add('hidden');
+            adminSection.classList.remove('hidden');
+        }
+
+        // 加载资源列表
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE_URL}?action=get_resources`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    showNotification('加载资源失败: ' + (data.error || '未知错误'), 'error');
+                    return;
+                }
+
+                const resources = data.data || [];
+
+                // 更新资源计数
+                resourceCount.textContent = `${resources.length} 个资源`;
+
+                // 清空列表
+                adminResourceList.innerHTML = '';
+
+                // 检查是否有资源
+                if (resources.length === 0) {
+                    noResources.classList.remove('hidden');
+                    return;
+                }
+
+                noResources.classList.add('hidden');
+
+                // 按日期降序排序
+                resources.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                // 生成资源列表
+                const typeNames = {
+                    'document': '文档',
+                    'video': '视频',
+                    'archive': '压缩包',
+                    'program': '编程',
+                    'image': '图片',
+                    'game': '游戏'
+                };
+
+                resources.forEach(resource => {
+                    const item = document.createElement('div');
+                    item.className = 'grid grid-cols-12 py-4 px-5 hover:bg-gray-50 transition-custom';
+                    item.innerHTML = `
+                        <div class="col-span-5 md:col-span-4 flex items-center">
+                            <i class="fa ${getResourceIcon(resource.type)} ${getResourceColor(resource.type)} mr-3 text-lg"></i>
+                            <div>
+                                <div class="font-medium text-dark">${resource.name}</div>
+                                <div class="text-xs text-gray-500 mt-0.5 hidden sm:block">
+                                    ${resource.description.length > 20 ? resource.description.substring(0, 20) + '...' : resource.description}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-3 hidden md:flex items-center text-gray-600">
+                            <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100">${typeNames[resource.type] || '其他'}</span>
+                        </div>
+                        <div class="col-span-2 hidden sm:flex items-center text-gray-600 text-sm">
+                            ${resource.uploader}
+                        </div>
+                        <div class="col-span-4 md:col-span-2 hidden lg:flex items-center text-gray-500 text-sm">
+                            ${formatDate(resource.date)}
+                        </div>
+                        <div class="col-span-7 md:col-span-2 flex items-center gap-2">
+                            <a href="${resource.link}" target="_blank" class="text-primary hover:text-primary/80 transition-custom p-1.5 rounded" title="查看链接">
+                                <i class="fa fa-link"></i>
+                            </a>
+                            <button class="edit-btn text-secondary hover:text-secondary/80 transition-custom p-1.5 rounded" data-id="${resource.id}" title="编辑资源">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="delete-btn text-danger hover:text-danger/80 transition-custom p-1.5 rounded" data-id="${resource.id}" title="删除资源">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    adminResourceList.appendChild(item);
+                });
+
+                // 绑定编辑和删除按钮事件
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        resourceToDelete = this.getAttribute('data-id');
+                        deleteModal.classList.remove('hidden');
+                    });
+                });
+
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', async function () {
+                        const resourceId = this.getAttribute('data-id');
+                        await loadResourceForEdit(resourceId);
+                    });
+                });
+
+            } catch (error) {
+                console.error('加载资源出错:', error);
+                showNotification('加载资源时发生错误', 'error');
+            }
+        }
+
+        // 加载资源用于编辑
+        async function loadResourceForEdit(resourceId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}?action=get_resource&id=${resourceId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    showNotification('获取资源详情失败: ' + (data.error || '未知错误'), 'error');
+                    return;
+                }
+
+                const resource = data.data;
+
+                // 填充表单
+                editResourceId.value = resource.id;
+                document.getElementById('resourceName').value = resource.name;
+                document.getElementById('resourceType').value = resource.type;
+                document.getElementById('uploaderName').value = resource.uploader;
+                document.getElementById('uploadDate').value = resource.date;
+                document.getElementById('resourceLink').value = resource.link;
+                document.getElementById('resourceDesc').value = resource.description || '';
+
+                // 显示取消按钮
+                cancelEditBtn.classList.remove('hidden');
+
+                // 修改提交按钮文本
+                addResourceForm.querySelector('button[type="submit"]').innerHTML =
+                    '<i class="fa fa-save"></i> 保存修改';
+
+                // 滚动到表单
+                document.getElementById('addResourceForm').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('加载资源详情出错:', error);
+                showNotification('加载资源详情时发生错误', 'error');
+            }
+        }
+
+        // 添加资源
+        async function addResource() {
+            // 获取表单数据
+            const name = document.getElementById('resourceName').value.trim();
+            const type = document.getElementById('resourceType').value;
+            const uploader = document.getElementById('uploaderName').value.trim();
+            const date = document.getElementById('uploadDate').value;
+            const link = document.getElementById('resourceLink').value.trim();
+            const description = document.getElementById('resourceDesc').value.trim();
+
+            // 验证表单
+            if (!name || !type || !uploader || !date || !link) {
+                showNotification('请填写所有必填字段', 'error');
+                return;
+            }
+
+            try {
+                // 准备JSON数据
+                const jsonData = {
+                    name: name,
+                    type: type,
+                    uploader: uploader,
+                    date: date,
+                    link: link,
+                    description: description
+                };
+
+                const response = await fetch(`${API_BASE_URL}?action=add_resource`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminPassword}`
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 重新加载列表
+                    await loadResources();
+
+                    // 重置表单
+                    resetForm();
+
+                    showNotification('资源添加成功', 'success');
+                } else {
+                    showNotification('添加失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('添加资源出错:', error);
+                showNotification('添加资源时发生错误', 'error');
+            }
+        }
+
+        // 更新资源
+        async function updateResource(resourceId) {
+            // 获取表单数据
+            const name = document.getElementById('resourceName').value.trim();
+            const type = document.getElementById('resourceType').value;
+            const uploader = document.getElementById('uploaderName').value.trim();
+            const date = document.getElementById('uploadDate').value;
+            const link = document.getElementById('resourceLink').value.trim();
+            const description = document.getElementById('resourceDesc').value.trim();
+
+            // 验证表单
+            if (!name || !type || !uploader || !date || !link) {
+                showNotification('请填写所有必填字段', 'error');
+                return;
+            }
+
+            try {
+                // 准备JSON数据
+                const jsonData = {
+                    name: name,
+                    type: type,
+                    uploader: uploader,
+                    date: date,
+                    link: link,
+                    description: description
+                };
+
+                const response = await fetch(`${API_BASE_URL}?action=update_resource&id=${resourceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminPassword}`
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 重新加载列表
+                    await loadResources();
+
+                    // 重置表单
+                    resetForm();
+
+                    showNotification('资源更新成功', 'success');
+                } else {
+                    showNotification('更新失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('更新资源出错:', error);
+                showNotification('更新资源时发生错误', 'error');
+            }
+        }
+
+        // 删除资源
+        async function handleDeleteResource(resourceId) {
+            try {
+                // 创建FormData对象
+                const formData = new FormData();
+                formData.append('admin_password', adminPassword);
+                formData.append('id', resourceId);
+
+                const response = await fetch(`${API_BASE_URL}?action=delete_resource`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 重新加载列表
+                    await loadResources();
+                    showNotification('资源删除成功', 'success');
+                } else {
+                    showNotification('删除失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('删除资源出错:', error);
+                showNotification('删除资源时发生错误', 'error');
+            }
+        }
+
+        // 重置表单
+        function resetForm() {
+            addResourceForm.reset();
+            document.getElementById('uploadDate').valueAsDate = new Date();
+            editResourceId.value = '';
+            cancelEditBtn.classList.add('hidden');
+
+            // 恢复提交按钮文本
+            addResourceForm.querySelector('button[type="submit"]').innerHTML =
+                '<i class="fa fa-save"></i> 保存资源';
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            notificationText.textContent = message;
+
+            // 设置通知样式
+            if (type === 'success') {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-green-500';
+                notificationIcon.className = 'fa fa-check-circle text-white text-lg';
+            } else if (type === 'error') {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-danger';
+                notificationIcon.className = 'fa fa-exclamation-circle text-white text-lg';
+            } else {
+                notification.className = 'fixed top-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-2 max-w-xs bg-primary';
+                notificationIcon.className = 'fa fa-info-circle text-white text-lg';
+            }
+
+            // 显示通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(calc(100% + 20px))';
+            }, 3000);
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        }
+
+        // 获取资源图标
+        function getResourceIcon(type) {
+            const icons = {
+                'document': 'fa-file-text-o',
+                'video': 'fa-file-video-o',
+                'archive': 'fa-file-zip-o',
+                'program': 'fa-file-code-o',
+                'image': 'fa-file-image-o',
+                'game': 'fa-gamepad'
+            };
+            return icons[type] || 'fa-file-o';
+        }
+
+        // 获取资源图标颜色
+        function getResourceColor(type) {
+            const colors = {
+                'document': 'text-blue-500',
+                'video': 'text-purple-500',
+                'archive': 'text-amber-500',
+                'program': 'text-green-500',
+                'image': 'text-red-500',
+                'game': 'text-indigo-500'
+            };
+            return colors[type] || 'text-gray-500';
+        }
+    </script>
+</body>
+
+</html>

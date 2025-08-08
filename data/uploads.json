@@ -1,0 +1,38 @@
+[
+    {
+        "id": "605c3f2e4d5f3",
+        "name": "Python基础教程.pdf",
+        "type": "document",
+        "uploader": "张三",
+        "date": "2023-01-15",
+        "link": "https:\/\/example.com\/python-tutorial.pdf",
+        "description": "Python编程入门教程，适合初学者学习"
+    },
+    {
+        "id": "605c3f2e4d5f4",
+        "name": "Web开发视频教程",
+        "type": "video",
+        "uploader": "李四",
+        "date": "2023-02-20",
+        "link": "https:\/\/example.com\/web-dev-course.mp4",
+        "description": "全面讲解前端和后端开发的视频教程"
+    },
+    {
+        "id": "68958650b759c",
+        "name": "测试资源",
+        "type": "document",
+        "uploader": "测试用户",
+        "date": "2023-08-08",
+        "link": "https:\/\/example.com\/test.pdf",
+        "description": "这是一个测试资源"
+    },
+    {
+        "id": "79eeed50ff70",
+        "name": "1",
+        "type": "document",
+        "uploader": "1",
+        "date": "2025-08-08",
+        "link": "https:\/\/1.c",
+        "description": "1"
+    }
+]
