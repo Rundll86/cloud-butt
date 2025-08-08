@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'uploader' => trim($input['uploader']),
         'date' => $input['date'],
         'link' => trim($input['link']),
-        'description' => isset($input['description']) ? trim($input['description']) : ''
+        'description' => isset($input['description']) ? trim($input['description']) : '',
+        'approved' => false  // 公开上传的资源默认未审核
     ];
 
     // 添加到资源列表

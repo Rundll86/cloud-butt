@@ -34,6 +34,16 @@ switch ($action) {
         require_once 'get_resource.php';
         break;
         
+    case 'get_resources_admin':
+        // 管理员获取所有资源列表
+        require_once 'get_resources_admin.php';
+        break;
+        
+    case 'approve_resource':
+        // 管理员审核资源
+        require_once 'approve_resource.php';
+        break;
+        
     default:
         http_response_code(400);
         header('Content-Type: application/json; charset=utf-8');

@@ -1,14 +1,12 @@
 <?php
 require_once 'config.php';
 
-// 获取资源列表
+// 管理员获取所有资源列表（包括未审核的）
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $resources = readData();
+    // 验证管理员权限
+    verifyAdmin();
     
-    // 只返回已审核的资源
-    $resources = array_filter($resources, function($resource) {
-        return isset($resource['approved']) && $resource['approved'] === true;
-    });
+    $resources = readData();
     
     // 按上传日期倒序排列
     usort($resources, function($a, $b) {

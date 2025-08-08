@@ -468,7 +468,11 @@
         // 加载资源列表
         async function loadResources() {
             try {
-                const response = await fetch(`${API_BASE_URL}?action=get_resources`);
+                const response = await fetch(`${API_BASE_URL}?action=get_resources_admin`, {
+                    headers: {
+                        'Authorization': `Bearer ${adminPassword}`
+                    }
+                });
                 const data = await response.json();
 
                 if (!data.success) {
@@ -506,6 +510,14 @@
                 };
 
                 resources.forEach(resource => {
+                    // 检查资源是否已审核
+                    const isApproved = resource.approved === true;
+                    const approvalButton = isApproved ? 
+                        '<span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">已审核</span>' : 
+                        `<button class="approve-btn text-secondary hover:text-secondary/80 transition-custom p-1.5 rounded" data-id="${resource.id}" title="审核通过">
+                            <i class="fa fa-check"></i>
+                        </button>`;
+
                     const item = document.createElement('div');
                     item.className = 'grid grid-cols-12 py-4 px-5 hover:bg-gray-50 transition-custom';
                     item.innerHTML = `
@@ -531,6 +543,7 @@
                             <a href="${resource.link}" target="_blank" class="text-primary hover:text-primary/80 transition-custom p-1.5 rounded" title="查看链接">
                                 <i class="fa fa-link"></i>
                             </a>
+                            ${approvalButton}
                             <button class="edit-btn text-secondary hover:text-secondary/80 transition-custom p-1.5 rounded" data-id="${resource.id}" title="编辑资源">
                                 <i class="fa fa-pencil"></i>
                             </button>
@@ -555,6 +568,14 @@
                     btn.addEventListener('click', async function () {
                         const resourceId = this.getAttribute('data-id');
                         await loadResourceForEdit(resourceId);
+                    });
+                });
+
+                // 绑定审核按钮事件
+                document.querySelectorAll('.approve-btn').forEach(btn => {
+                    btn.addEventListener('click', async function () {
+                        const resourceId = this.getAttribute('data-id');
+                        await approveResource(resourceId);
                     });
                 });
 
@@ -734,6 +755,38 @@
             } catch (error) {
                 console.error('删除资源出错:', error);
                 showNotification('删除资源时发生错误', 'error');
+            }
+        }
+
+        // 审核资源
+        async function approveResource(resourceId) {
+            try {
+                // 准备JSON数据
+                const jsonData = {
+                    id: resourceId
+                };
+
+                const response = await fetch(`${API_BASE_URL}?action=approve_resource`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminPassword}`
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 重新加载列表
+                    await loadResources();
+                    showNotification('资源审核通过', 'success');
+                } else {
+                    showNotification('审核失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('审核资源出错:', error);
+                showNotification('审核资源时发生错误', 'error');
             }
         }
 

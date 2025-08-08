@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'uploader' => trim($input['uploader']),
         'date' => $input['date'],
         'link' => trim($input['link']),
-        'description' => isset($input['description']) ? trim($input['description']) : ''
+        'description' => isset($input['description']) ? trim($input['description']) : '',
+        'approved' => true  // 管理员上传的资源直接审核通过
     ];
 
     // 添加到资源列表
